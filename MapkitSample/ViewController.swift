@@ -9,6 +9,8 @@ import UIKit
 import MapKit
 
 class ViewController: UIViewController {
+    
+    private var directions: [String] = []
 
     private lazy var mapView: MKMapView = {
         let map = MKMapView()
@@ -21,7 +23,7 @@ class ViewController: UIViewController {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Show directions", for: .normal)
-        button.addTarget(self, action: #selector(showDirections), for: .touchUpInside)
+        button.addTarget(self, action: #selector(tapShowDirections), for: .touchUpInside)
         return button
     }()
     
@@ -29,9 +31,14 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         setup()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        initMapView()
+    }
 
-    @objc private func showDirections() {
-        
+    @objc private func tapShowDirections() {
+        presenModal()
     }
 
 }
@@ -42,7 +49,6 @@ private extension ViewController {
         mapView.delegate = self
         addViews()
         setConstraints()
-        initMapView()
     }
     
     func addViews() {
@@ -92,8 +98,25 @@ private extension ViewController {
                 route.polyline.boundingMapRect,
                 edgePadding: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20),
                 animated: true)
+            self?.directions = route.steps.map { $0.instructions }.filter { !$0.isEmpty }
         }
         
+    }
+    
+    func enableDirectionsButton(enable: Bool) {
+        showDirectionsButton.isEnabled = enable
+    }
+    
+    func presenModal() {
+        let directionsViewController = DirectionsViewController()
+        directionsViewController.setData(directions: directions)
+        
+        let nav = UINavigationController(rootViewController: directionsViewController)
+        nav.modalPresentationStyle = .pageSheet
+        if let sheet = nav.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+        }
+        present(nav, animated: true, completion: nil)
     }
     
 }
