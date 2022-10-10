@@ -42,6 +42,7 @@ private extension ViewController {
         mapView.delegate = self
         addViews()
         setConstraints()
+        initMapView()
     }
     
     func addViews() {
@@ -64,6 +65,13 @@ private extension ViewController {
             showDirectionsButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
         
+    }
+    
+    func initMapView() {
+        let region = MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 40.71, longitude: -74),
+            span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+        mapView.setRegion(region, animated: true)
     }
     
 }
