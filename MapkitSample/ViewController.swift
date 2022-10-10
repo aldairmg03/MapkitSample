@@ -72,6 +72,28 @@ private extension ViewController {
             center: CLLocationCoordinate2D(latitude: 40.71, longitude: -74),
             span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
         mapView.setRegion(region, animated: true)
+        
+        let placemarkNY = MKPlacemark(
+            coordinate: CLLocationCoordinate2D(latitude: 40.71, longitude: -74))
+        let placemarkBoston = MKPlacemark(
+            coordinate: CLLocationCoordinate2D(latitude: 42.36, longitude: -71.05))
+        
+        let request = MKDirections.Request()
+        request.source = MKMapItem(placemark: placemarkNY)
+        request.destination = MKMapItem(placemark: placemarkBoston)
+        request.transportType = .automobile
+        
+        let directions = MKDirections(request: request)
+        directions.calculate { [weak self] response, error in
+            guard let route = response?.routes.first else { return }
+            self?.mapView.addAnnotations([placemarkNY, placemarkBoston])
+            self?.mapView.addOverlay(route.polyline)
+            self?.mapView.setVisibleMapRect(
+                route.polyline.boundingMapRect,
+                edgePadding: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20),
+                animated: true)
+        }
+        
     }
     
 }
